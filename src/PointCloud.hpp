@@ -49,6 +49,14 @@ public:
     /*! Destructors */
     ~Point3Cloud();
     
+    /*! Setters */
+    void setData( const cv::Mat& data );
+    void setBgr( const cv::Mat& bgr );
+    
+    /*! Getters */
+    void getData( cv::Mat& data ) const;
+    void getBgr( cv::Mat& bgr ) const;
+    
     /*! Load/Read/Write */
     void grabFrame( cv::VideoCapture capturer, bool grabColor = true );
     void readFrame( const std::string &name );
@@ -66,6 +74,13 @@ protected:
     /*! Atributes */
     cv::Mat data;
     cv::Mat bgr;
+
+private:
+    cv::Vec3f bBCenter;
+    cv::Vec3f bBPmin, bBPmax;
+    float bBDistance;
+    
+    void computeCenter();
 };
 
 } // mcv
