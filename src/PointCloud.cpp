@@ -92,16 +92,32 @@ void Point3Cloud::writeFrame( const std::string &name ){
 /*! Public Methods */
 void Point3Cloud::applyTransformation( const cv::Matx33f& rotation,
                                        const cv::Vec3f translation ){
-
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        cv::Vec3f theV( *it );
+        cv::Point3f theP(theV[0],theV[1],theV[2]);
+        cv::Point3f newP = rotation*theP;
+        *it = cv::Vec3f(newP.x, newP.y, newP.z) + translation;
+    } 
 }
 
 void Point3Cloud::applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
                     const cv::Matx33f& rotZ ){
-
+    cv::Matx33f fullR = rotX*rotY*rotZ;
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        cv::Vec3f theV( *it );
+        cv::Point3f theP(theV[0],theV[1],theV[2]);
+        cv::Point3f newP = fullR*theP;
+        *it = cv::Vec3f(newP.x, newP.y, newP.z);
+    } 
 }
 
-void Point3Cloud::applyTranslation( const cv::Matx33f& translation ){
-
+void Point3Cloud::applyTranslation( const cv::Vec3f& translation ){
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        *it += translation;;
+    } 
 }
 
 void Point3Cloud::displayColor2D( const std::string name ){

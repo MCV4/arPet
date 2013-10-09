@@ -67,7 +67,7 @@ public:
                               const cv::Vec3f translation );   
     void applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
                         const cv::Matx33f& rotZ );
-    void applyTranslation( const cv::Matx33f& translation );
+    void applyTranslation( const cv::Vec3f& translation );
     void displayColor2D( const std::string windowName );
     
 protected:
