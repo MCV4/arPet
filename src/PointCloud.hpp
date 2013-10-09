@@ -49,6 +49,14 @@ public:
     /*! Destructors */
     ~Point3Cloud();
     
+    /*! Setters */
+    void setData( const cv::Mat& data );
+    void setBgr( const cv::Mat& bgr );
+    
+    /*! Getters */
+    void getData( cv::Mat& data ) const;
+    void getBgr( cv::Mat& bgr ) const;
+    
     /*! Load/Read/Write */
     void grabFrame( cv::VideoCapture capturer, bool grabColor = true );
     void readFrame( const std::string &name );
@@ -59,13 +67,20 @@ public:
                               const cv::Vec3f translation );   
     void applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
                         const cv::Matx33f& rotZ );
-    void applyTranslation( const cv::Matx33f& translation );
+    void applyTranslation( const cv::Vec3f& translation );
     void displayColor2D( const std::string windowName );
     
 protected:
     /*! Atributes */
     cv::Mat data;
     cv::Mat bgr;
+
+private:
+    cv::Vec3f bBCenter;
+    cv::Vec3f bBPmin, bBPmax;
+    float bBDistance;
+    
+    void computeCenter();
 };
 
 } // mcv
