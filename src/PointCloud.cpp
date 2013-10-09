@@ -50,6 +50,24 @@ Point3Cloud::Point3Cloud( const cv::Mat& data_, const cv::Mat& bgr_ ){
 Point3Cloud::~Point3Cloud(){
 }
 
+/*! Setters */
+void Point3Cloud::setData( const cv::Mat& data_ ){
+    data = data_.clone();
+}
+
+void Point3Cloud::setBgr( const cv::Mat& bgr_ ){
+    bgr = bgr_.clone();
+}
+
+/*! Getters */
+void Point3Cloud::getData( cv::Mat& data_ ) const{
+    data_ = data.clone();
+}
+
+void Point3Cloud::getBgr( cv::Mat& bgr_ ) const{
+    bgr_ = bgr.clone();
+}
+    
 /*! Load/Read/Write */
 void Point3Cloud::grabFrame( cv::VideoCapture capturer, bool grabColor ){
     capturer.grab();
@@ -74,21 +92,56 @@ void Point3Cloud::writeFrame( const std::string &name ){
 /*! Public Methods */
 void Point3Cloud::applyTransformation( const cv::Matx33f& rotation,
                                        const cv::Vec3f translation ){
-
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        cv::Vec3f theV( *it );
+        cv::Point3f theP(theV[0],theV[1],theV[2]);
+        cv::Point3f newP = rotation*theP;
+        *it = cv::Vec3f(newP.x, newP.y, newP.z) + translation;
+    } 
 }
 
 void Point3Cloud::applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
                     const cv::Matx33f& rotZ ){
-
+    cv::Matx33f fullR = rotX*rotY*rotZ;
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        cv::Vec3f theV( *it );
+        cv::Point3f theP(theV[0],theV[1],theV[2]);
+        cv::Point3f newP = fullR*theP;
+        *it = cv::Vec3f(newP.x, newP.y, newP.z);
+    } 
 }
 
-void Point3Cloud::applyTranslation( const cv::Matx33f& translation ){
-
+void Point3Cloud::applyTranslation( const cv::Vec3f& translation ){
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        *it += translation;;
+    } 
 }
 
 void Point3Cloud::displayColor2D( const std::string name ){
     if ( !bgr.empty() )
         cv::imshow( name, bgr );
+}
+
+/*! Private Methods */
+void Point3Cloud::computeCenter(){
+    bBPmin=data.at<cv::Vec3f>(0,0);
+    bBPmax=data.at<cv::Vec3f>(0,0);
+    
+    for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
+         it != data.end<cv::Vec3f>(); ++it ){
+        cv::Vec3f P( *it );
+        for( int j=0; j<2; j++){
+            bBPmin[j] = std::min( bBPmin[j], P[j] );
+            bBPmax[j] = std::max( bBPmax[j], P[j] );
+        }
+        bBCenter += P;
+    }
+
+    bBCenter/=data.rows*data.cols;
+    bBDistance = norm(bBPmax-bBPmin);
 }
 
 } // mcv
