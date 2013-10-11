@@ -79,13 +79,13 @@ void Point3Cloud::grabFrame( cv::VideoCapture capturer, bool grabColor ){
 
 void Point3Cloud::readFrame( const std::string &name ){
     cv::FileStorage fs( name, cv::FileStorage::READ );
-    fs["3data"]>>data;
+    fs["data3"]>>data;
     fs["Cdata"]>>bgr;
 }
 
 void Point3Cloud::writeFrame( const std::string &name ){
     cv::FileStorage fs( name, cv::FileStorage::WRITE );
-    fs<<"3data"<<data;
+    fs<<"data3"<<data;
     fs<<"Cdata"<<bgr;
 }
 
