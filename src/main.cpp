@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // std
 #include <iostream>
+#include <stdio.h>
 
 using namespace cv;
 using namespace std;
@@ -50,11 +51,23 @@ int main( int argc, char * argv[] )
     if (capture.isOpened()){
         capture.set( CV_CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE, CV_CAP_OPENNI_VGA_30HZ );
         
+        int cont=0;
         for (;;){
             pc.grabFrame( capture );
             pc.displayColor2D(" COLOR INFO ");
-            pc.writeFrame("PointCloudTest.yml");
-            waitKey(30);
+
+            int key = waitKey(30);
+
+            if (key == 'q'){
+                break;
+            }
+
+            if (key == 'n'){
+                cont++;
+                char text[50];
+                sprintf(text, "PointCloudTest%d.yml", cont);
+                pc.writeFrame(text);
+            }
         }
     }
     
