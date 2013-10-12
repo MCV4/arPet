@@ -37,13 +37,21 @@ namespace mcv {
 Point3Cloud::Point3Cloud(){
 }
 
+Point3Cloud::Point3Cloud(const Point3Cloud &cloud){
+    cloud.getBgr(bgr);
+    cloud.getData(data);
+    computeCenter();
+}
+
 Point3Cloud::Point3Cloud( const cv::Mat& data_ ){
     data = data_.clone();
+    computeCenter();
 }
 
 Point3Cloud::Point3Cloud( const cv::Mat& data_, const cv::Mat& bgr_ ){
     data = data_.clone();
     bgr = bgr_.clone();
+    computeCenter();
 }
 
 /*! Destructors */   
@@ -53,6 +61,7 @@ Point3Cloud::~Point3Cloud(){
 /*! Setters */
 void Point3Cloud::setData( const cv::Mat& data_ ){
     data = data_.clone();
+    computeCenter();
 }
 
 void Point3Cloud::setBgr( const cv::Mat& bgr_ ){
@@ -75,6 +84,7 @@ void Point3Cloud::grabFrame( cv::VideoCapture capturer, bool grabColor ){
         capturer.retrieve( bgr, CV_CAP_OPENNI_BGR_IMAGE );
         
     capturer.retrieve( data, CV_CAP_OPENNI_POINT_CLOUD_MAP );
+    computeCenter();
 }
 
 void Point3Cloud::readFrame( const std::string &name ){
@@ -98,7 +108,8 @@ void Point3Cloud::applyTransformation( const cv::Matx33f& rotation,
         cv::Point3f theP(theV[0],theV[1],theV[2]);
         cv::Point3f newP = rotation*theP;
         *it = cv::Vec3f(newP.x, newP.y, newP.z) + translation;
-    } 
+    }
+    computeCenter();
 }
 
 void Point3Cloud::applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
@@ -110,14 +121,16 @@ void Point3Cloud::applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rot
         cv::Point3f theP(theV[0],theV[1],theV[2]);
         cv::Point3f newP = fullR*theP;
         *it = cv::Vec3f(newP.x, newP.y, newP.z);
-    } 
+    }
+    computeCenter();
 }
 
 void Point3Cloud::applyTranslation( const cv::Vec3f& translation ){
     for( cv::MatIterator_<cv::Vec3f> it = data.begin<cv::Vec3f>(); 
          it != data.end<cv::Vec3f>(); ++it ){
         *it += translation;;
-    } 
+    }
+    computeCenter();
 }
 
 void Point3Cloud::displayColor2D( const std::string name ){

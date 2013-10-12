@@ -28,61 +28,47 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //M*/
 
-#ifndef __POINTCLOUD_HPP__
-#define __POINTCLOUD_HPP__
-
+// std //
+#include <string>
+#include <iostream>
+#include <cmath>
+// mcv //
+#include "PointCloud.hpp"
+#include "DrawingContext.hpp"
+#include "PointCloudViewer.hpp"
+// cv/gl //
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
-#include <string>
 
-/*! PointCloud class */
-namespace mcv {
-    
-class Point3Cloud
-{
-public:
-    /*! Constructors */
-    Point3Cloud();
-    Point3Cloud( const cv::Mat& data );
-    Point3Cloud( const cv::Mat& data, const cv::Mat& bgr );
-    /*! Destructors */
-    ~Point3Cloud();
-    
-    /*! Setters */
-    void setData( const cv::Mat& data );
-    void setBgr( const cv::Mat& bgr );
-    
-    /*! Getters */
-    void getData( cv::Mat& data ) const;
-    void getBgr( cv::Mat& bgr ) const;
-    
-    /*! Load/Read/Write */
-    void grabFrame( cv::VideoCapture capturer, bool grabColor = true );
-    void readFrame( const std::string &name );
-    void writeFrame( const std::string &name );
-    
-    /*! Public Methods */
-    void applyTransformation( const cv::Matx33f& rotation,
-                              const cv::Vec3f translation );   
-    void applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
-                        const cv::Matx33f& rotZ );
-    void applyTranslation( const cv::Vec3f& translation );
-    void displayColor2D( const std::string windowName );
-    
-protected:
-    /*! Atributes */
-    cv::Mat data;
-    cv::Mat bgr;
+using namespace cv;
+using namespace std;
 
-private:
-    cv::Vec3f bBCenter;
-    cv::Vec3f bBPmin, bBPmax;
-    float bBDistance;
-    
-    void computeCenter();
-};
 
-} // mcv
+int main( int argc, char * argv[] ){
 
-#endif
+
+    mcv::Point3Cloud mypc;
+    mcv::PointCloudViewer view("MCV AR", cv::Size(640,480));
+    if (argc>1) mypc.readFrame(argv[1]);
+
+    cv::Mat color;
+    mypc.getBgr(color);
+    view.updatePointCloud(mypc);
+    cv::imshow("TEST",color);
+
+    bool loop=true;
+    if (argc>1){
+        while (loop){
+
+            view.updateWindow();
+            int key = cv::waitKey(30);
+
+            if (key=='q')
+                break;
+        }
+    }
+    return 0;
+}
