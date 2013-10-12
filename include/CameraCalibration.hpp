@@ -12,6 +12,7 @@
 /**
 * A camera calibration class that stores intrinsic matrix and distortion coefficients.
 */
+namespace mcv {
 class CameraCalibration
 {
 public:
@@ -39,5 +40,5 @@ private:
     cv::Matx33f     m_intrinsic;
     cv::Mat_<float> m_distortion;
 };
-
+} //mcv
 #endif

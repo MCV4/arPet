@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
-
+namespace mcv {
 struct Transformation
 {
   Transformation();
@@ -23,5 +23,5 @@ private:
   Matx33f m_rotation;
   Vec3f  m_translation;
 };
-
+}//
 #endif

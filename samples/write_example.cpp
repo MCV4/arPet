@@ -28,63 +28,48 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //M*/
 
-#ifndef __POINTCLOUD_HPP__
-#define __POINTCLOUD_HPP__
+// MCV
+#include "PointCloud.hpp"
 
+// OpenCV
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include <string>
+// std
+#include <iostream>
+#include <stdio.h>
 
-/*! PointCloud class */
-namespace mcv {
-    
-class Point3Cloud
+using namespace cv;
+using namespace std;
+
+
+int main( /*int argc, char * argv[]*/ )
 {
-public:
-    /*! Constructors */
-    Point3Cloud();
-    Point3Cloud( const mcv::Point3Cloud& cloud );
-    Point3Cloud( const cv::Mat& data );
-    Point3Cloud( const cv::Mat& data, const cv::Mat& bgr );
-    /*! Destructors */
-    ~Point3Cloud();
+    VideoCapture capture( CV_CAP_OPENNI );
+    mcv::Point3Cloud pc;
     
-    /*! Setters */
-    void setData( const cv::Mat& data );
-    void setBgr( const cv::Mat& bgr );
+    if (capture.isOpened()){
+        capture.set( CV_CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE, CV_CAP_OPENNI_VGA_30HZ );
+        
+        int cont=0;
+        for (;;){
+            pc.grabFrame( capture );
+            pc.displayColor2D(" COLOR INFO ");
+
+            int key = waitKey(30);
+
+            if (key == 'q'){
+                break;
+            }
+
+            if (key == 'n'){
+                cont++;
+                char text[50];
+                sprintf(text, "PointCloudTest%d.yml", cont);
+                pc.writeFrame(text);
+            }
+        }
+    }
     
-    /*! Getters */
-    void getData( cv::Mat& data ) const;
-    void getBgr( cv::Mat& bgr ) const;
-    
-    /*! Load/Read/Write */
-    void grabFrame( cv::VideoCapture capturer, bool grabColor = true );
-    void readFrame( const std::string &name );
-    void writeFrame( const std::string &name );
-    
-    /*! Public Methods */
-    void applyTransformation( const cv::Matx33f& rotation,
-                              const cv::Vec3f translation );   
-    void applyRotation( const cv::Matx33f& rotX, const cv::Matx33f& rotY,
-                        const cv::Matx33f& rotZ );
-    void applyTranslation( const cv::Vec3f& translation );
-    void displayColor2D( const std::string windowName );
-
-    /*! Public data */
-    cv::Vec3f bBCenter;
-    cv::Vec3f bBPmin, bBPmax;
-    float bBDistance;
-
-protected:
-    /*! Atributes */
-    cv::Mat data;
-    cv::Mat bgr;
-
-private:
-    void computeCenter();
-};
-
-} // mcv
-
-#endif
+    return 0;
+}

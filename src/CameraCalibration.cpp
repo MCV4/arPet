@@ -5,7 +5,7 @@
 *****************************************************************************/
 
 #include "CameraCalibration.hpp"
-
+namespace mcv {
 CameraCalibration::CameraCalibration()
 {
 }
@@ -87,3 +87,5 @@ float CameraCalibration::cy() const
 {
     return m_intrinsic(1,2);
 }
+
+}//mcv
