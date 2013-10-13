@@ -45,30 +45,13 @@ using namespace std;
 
 int main( int argc, char * argv[] )
 {
-    VideoCapture capture( CV_CAP_OPENNI );
     mcv::Point3Cloud pc;
-    
-    if (capture.isOpened()){
-        capture.set( CV_CAP_OPENNI_IMAGE_GENERATOR_OUTPUT_MODE, CV_CAP_OPENNI_VGA_30HZ );
-        
-        int cont=0;
-        for (;;){
-            pc.grabFrame( capture );
-            pc.displayColor2D(" COLOR INFO ");
+            
+    for (int i=1; i<argc; i++){
+        pc.readFrame(argv[i]);
+        pc.displayColor2D(" COLOR INFO ");
 
-            int key = waitKey(30);
-
-            if (key == 'q'){
-                break;
-            }
-
-            if (key == 'n'){
-                cont++;
-                char text[50];
-                sprintf(text, "PointCloudTest%d.yml", cont);
-                pc.writeFrame(text);
-            }
-        }
+        while( waitKey(30)!=' ' );
     }
     
     return 0;
